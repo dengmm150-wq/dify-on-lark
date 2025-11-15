@@ -8,7 +8,9 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import top.duhongming.utils.BeanUtils;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import static top.duhongming.common.Constants.ID_TEMPLATE;
@@ -58,6 +60,44 @@ public class SendMessageTextService {
         CreateMessageResp resp = BeanUtils.getBean(Client.class).im().v1().message().create(req);
         consoleLog(resp);
         return resp.getData();
+    }
+
+    /**
+     * https://open.feishu.cn/document/server-docs/im-v1/message/list
+     *
+     * @param chatId
+     * @param sortType
+     * @param startTime
+     * @param endTime
+     * @return
+     * @throws Exception
+     */
+    public List<Message> chatHistory(String chatId, String sortType, String startTime, String endTime) throws Exception {
+        String pageToken = null;
+        List<Message> messages = new ArrayList<>();
+        while (true) {
+            // 创建请求对象
+            ListMessageReq req = ListMessageReq.newBuilder()
+                    .containerIdType("chat")
+                    .containerId(chatId)
+                    .startTime(startTime)
+                    .endTime(endTime)
+                    .sortType(sortType)
+                    .pageSize(50)
+                    .pageToken(pageToken)
+                    .build();
+
+            // 发起请求
+            ListMessageResp resp = BeanUtils.getBean(Client.class).im().v1().message().list(req);
+
+            ListMessageRespBody listMessageRespBody = resp.getData();
+            messages.addAll(List.of(listMessageRespBody.getItems()));
+            if (!listMessageRespBody.getHasMore()) {
+                break;
+            }
+            pageToken = listMessageRespBody.getPageToken();
+        }
+        return messages;
     }
 
 }

@@ -6,9 +6,10 @@ import top.duhongming.utils.BeanUtils;
 
 @RestController
 public class TestController {
+
     @GetMapping("/")
     public void sendMessage() {
         BeanUtils.printAllBeans();
-
     }
+
 }

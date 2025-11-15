@@ -10,9 +10,9 @@
     </parent>
     <groupId>top.duhongming</groupId>
     <artifactId>dify-on-lark</artifactId>
-    <version>1.0.0</version>
+    <version>1.0.1</version>
     <name>dify-on-lark</name>
-    <description>dify-on-lark</description>
+    <description>dify-on-lark是一个非常轻量级、易于部署 Dify 的飞书机器人集成方案。可以通过简单配置来对接你的Dify应用和企业内部机器人，实现企业内部机器人的群聊、私聊智能问答，且支持飞书的AI卡片流式打字机输出效果。</description>
     <url/>
     <licenses>
         <license/>
