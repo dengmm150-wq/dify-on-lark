@@ -1,5 +1,7 @@
 <div align="center">
 
+
+
 [English](README_EN.md) / 简体中文 / (PR for your language)
 
 [![GitHub release (latest by date)](https://img.shields.io/github/v/release/duhongming1990/dify-on-lark)](https://github.com/duhongming1990/dify-on-lark/releases/latest)
@@ -9,6 +11,10 @@
 <img src="https://img.shields.io/maven-central/v/io.github.imfangs/dify-java-client.svg?label=dify-java-client" />
 
 </div>
+
+Github：https://github.com/duhongming1990/dify-on-lark
+
+Gitee：https://gitee.com/duhongming/dify-on-lark
 
 # 1 介绍
 
@@ -26,7 +32,7 @@ dify-on-lark是一个非常轻量级、易于部署 Dify
 - 支持token用量分析和推理耗时
 - 支持点赞和踩功能和Dify后台交互
 
-![dify-on-lark.png](images/dify-on-lark.png)
+![dify-on-lark.png](http://kodo.cdn.duhongming.top/dify-on-lark/dify-on-lark.png)
 
 ## 1.2 项目背景
 
@@ -72,7 +78,7 @@ https://open.feishu.cn/app
 
 ### 2.1.1 获取appId和appSecret
 
-![](images/lark-config-1.png)
+![](http://kodo.cdn.duhongming.top/dify-on-lark/lark-config-1.png)
 
 ```properties
 platform.lark.appId=xxx
@@ -81,7 +87,7 @@ platform.lark.appSecret=xxx
 
 ### 2.1.2 获取verificationToken和encryptKey
 
-![](images/lark-config-2.png)
+![](http://kodo.cdn.duhongming.top/dify-on-lark/lark-config-2.png)
 
 ```properties
 platform.lark.verificationToken=xxx
@@ -107,7 +113,7 @@ platform.lark.cardTemplateId=xxx
 
 ## 2.2 Dify配置
 
-![](images/dify-config.png)
+![](http://kodo.cdn.duhongming.top/dify-on-lark//dify-config.png)
 
 ```properties
 provider.dify.url=http://localhost/v1
@@ -218,29 +224,29 @@ spec:
 ### 2.4.1 事件配置
 
 使用 长连接 接收事件 ，点击`保存`
-![](images/event-config.png)
+![](http://kodo.cdn.duhongming.top/dify-on-lark/event-config.png)
 
 ### 2.4.2 回调配置
 
 使用 长连接 接收回调 ，点击`保存`
-![](images/callback-config.png)
+![](http://kodo.cdn.duhongming.top/dify-on-lark/callback-config.png)
 
 ### 2.4.3 添加事件
 
 事件配置中添加：
 
 - 接收消息 im.message.receive_v1
-  ![](images/event-config-im.message.receive_v1.png)
+  ![](http://kodo.cdn.duhongming.top/dify-on-lark/event-config-im.message.receive_v1.png)
 
 回调配置中添加：
 
 - 卡片回传交互 card.action.trigger
-  ![](images/callback-config-card.action.trigger.png)
+  ![](http://kodo.cdn.duhongming.top/dify-on-lark/callback-config-card.action.trigger.png)
 
 ### 2.4.4 版本发布
 
 最后别忘记点击版本发布！最后别忘记点击版本发布！最后别忘记点击版本发布！重要事情说三遍......
-![](images/release-version.png)
+![](http://kodo.cdn.duhongming.top/dify-on-lark/release-version.png)
 
 ### 2.4.5 权限管理
 
@@ -264,7 +270,7 @@ spec:
 }
 ```
 
-![](images/min-privilege.png)
+![](http://kodo.cdn.duhongming.top/dify-on-lark/min-privilege.png)
 
 # 3 提供飞书API增强接口对接Dify
 
