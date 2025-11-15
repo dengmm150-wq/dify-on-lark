@@ -36,7 +36,7 @@ public class ApiController {
         return sendMessageTextService.chatHistory(chatId, sortType, startTime, endTime);
     }
 
-    @GetMapping("/v1/chats")
+    @GetMapping("/api/v1/chats")
     public List<ListChat> chats(String userIdType, String sortType) throws Exception {
         return sendMessageTextService.chats(userIdType, sortType);
     }

@@ -127,6 +127,7 @@ docker run -d --name dify-on-lark \
   --platform.lark.verificationToken=xxx \
   --provider.dify.url=http://localhost/v1 \
   --provider.dify.auth=app-xxx" \
+  -p 8088:8088 \
   --restart=always \
 duhongming/dify-on-lark:v1.0.0 
 ```
@@ -140,6 +141,75 @@ mv application.template.properties application.properties
 ```
 
 run `DifyOnLarkApplication`就行了！
+
+### 2.3.3 k8s启动
+一键执行：
+```bash
+kubectl apply -f dify-on-lark.yaml
+```
+
+dify-on-lark.yaml 如下：
+```yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: dify-on-lark  # 对应 --name dify-on-lark
+  labels:
+    app: dify-on-lark
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: dify-on-lark
+  template:
+    metadata:
+      labels:
+        app: dify-on-lark
+    spec:
+      containers:
+      - name: dify-on-lark  # 容器名称与部署名保持一致
+        image: duhongming/dify-on-lark:v1.0.1  # 镜像地址
+        env:
+        - name: TZ
+          value: "Asia/Shanghai"  # 时区环境变量
+        - name: PARAMS
+          value: |  # 保留原参数结构，换行保持可读性
+            --platform.lark.appId=xxx
+            --platform.lark.appSecret=xxx
+            --platform.lark.encryptKey=xxx
+            --platform.lark.verificationToken=xxx
+            --provider.dify.url=http://localhost/v1
+            --provider.dify.auth=app-xxx
+        ports:
+        - containerPort: 8088  # 假设应用默认暴露8080端口（请根据实际端口调整）
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: dify-on-lark-service  # Service名称与部署名关联
+spec:
+  selector:
+    app: dify-on-lark  # 关联到上面的Deployment
+  ports:
+  - port: 8088  # Service暴露的集群内访问端口
+    targetPort: 8088  # 映射到容器的端口（需与containerPort一致）
+  type: ClusterIP  # 集群内部可访问，如需外部访问可改为NodePort/LoadBalancer
+---
+# https://doc.traefik.io/traefik/reference/routing-configuration/kubernetes/crd/http/ingressroute/ 
+apiVersion: traefik.io/v1alpha1
+kind: IngressRoute
+metadata:
+  name: dify-on-lark-ingress-route-http
+spec:
+  entryPoints:
+  - web
+  routes:
+  - match: Host(`dify-on-lark.example.com`) 
+    kind: Rule
+    services:
+      - name: dify-on-lark-service
+        port: 8088
+```
 
 ## 2.4 飞书平台配置
 

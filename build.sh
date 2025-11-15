@@ -1,9 +1,10 @@
 git fetch
-git pull origin master
+git pull origin main
 git tag --sort=-creatordate | head -n 1
 
 # 定义最新tag变量
 LATEST_TAG=$(git tag --sort=-creatordate | head -n 1)
+echo $LATEST_TAG
 
 mvn clean package
 
@@ -19,4 +20,4 @@ docker tag registry.cn-hangzhou.aliyuncs.com/dockerdance/dify-on-lark:$LATEST_TA
 # 推送至第二个仓库
 docker push duhongming/dify-on-lark:$LATEST_TAG
 
-git push gitee master
+git push gitee main
