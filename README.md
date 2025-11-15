@@ -291,7 +291,7 @@ ByCreateTimeDesc：按消息创建时间降序排列
 待查询历史信息的结束时间，秒级时间戳。
 注意：thread 容器类型暂不支持获取指定时间范围内的消息。
 
-GET http://localhost:8088/v1/chat/history?chatId=oc_xxx&timeType=day
+GET http://localhost:8088/api/v1/chat/history?chatId=oc_xxx&timeType=day
 
 ## 3.2 机器人bot被加入了哪些群
 - userIdType 用户 ID 类型
@@ -309,4 +309,4 @@ ByCreateTimeAsc：按群组创建时间升序排列
 ByActiveTimeDesc：按群组活跃时间降序排列。因群组活跃时间变动频繁，使用 ByActiveTimeDesc 排序方式可能会造成群组遗漏。例如，设置分页大小为 10，发起第一次请求获取到第一页数据后，原本排在第 11 位的群组中有群成员发送了一条消息，那么该群组将被排列到第 1 位，此时发起请求获取第二页数据时，该群组将不能被获取到，需要再从第一页开始获取。
 默认值：ByCreateTimeAsc
 
-GET http://localhost:8088/v1/chats
+GET http://localhost:8088/api/v1/chats
