@@ -12,7 +12,8 @@
 
 # 1 介绍
 
-dify-on-lark是一个非常轻量级、易于部署 Dify 的飞书机器人集成方案。可以通过简单配置来对接你的Dify应用和企业内部机器人，实现企业内部机器人的群聊、私聊智能问答，且支持飞书的AI卡片流式打字机输出效果。
+dify-on-lark是一个非常轻量级、易于部署 Dify
+的飞书机器人集成方案。可以通过简单配置来对接你的Dify应用和企业内部机器人，实现企业内部机器人的群聊、私聊智能问答，且支持飞书的AI卡片流式打字机输出效果。
 
 ## 1.1 项目功能
 
@@ -114,6 +115,7 @@ provider.dify.auth=app-xxx
 ```
 
 ## 2.3 启动服务
+
 ### 2.3.1 利用Docker启动服务
 
 ```bash
@@ -128,11 +130,15 @@ docker run -d --name dify-on-lark \
   --restart=always \
 duhongming/dify-on-lark:v1.0.0 
 ```
+
 ### 2.3.2 从源码启动服务
+
 重命名文件，填入配置即可！
+
 ```bash
 mv application.template.properties application.properties
 ```
+
 run `DifyOnLarkApplication`就行了！
 
 ## 2.4 飞书平台配置
@@ -154,12 +160,12 @@ run `DifyOnLarkApplication`就行了！
 事件配置中添加：
 
 - 接收消息 im.message.receive_v1
-![](images/event-config-im.message.receive_v1.png)
+  ![](images/event-config-im.message.receive_v1.png)
 
 回调配置中添加：
 
 - 卡片回传交互 card.action.trigger
-![](images/callback-config-card.action.trigger.png)
+  ![](images/callback-config-card.action.trigger.png)
 
 ### 2.4.4 版本发布
 
@@ -167,7 +173,9 @@ run `DifyOnLarkApplication`就行了！
 ![](images/release-version.png)
 
 ### 2.4.5 权限管理
+
 最小开通权限，导入即可：
+
 ```json
 {
   "scopes": {
@@ -185,4 +193,50 @@ run `DifyOnLarkApplication`就行了！
   }
 }
 ```
+
 ![](images/min-privilege.png)
+
+# 3 提供飞书API增强接口对接Dify
+
+## 3.1 通过 日/周/月/年 等维度获取指定群的历史对话，用于总结群对话
+- chatId 可以直接在群里面 @dify-on-lark id 即可获取！
+
+- timeType 时间类型，为下列值时，自动计算startTime和endTime
+| 时间类型 | 功能 |
+|-------|----------|
+| day | 获取昨日起止时间 |
+| week | 获取上周起止时间 |
+| month | 获取上月起止时间 |
+| year | 获取去年起止时间 |
+
+- sortType 消息排序方式。
+ByCreateTimeAsc：按消息创建时间升序排列
+ByCreateTimeDesc：按消息创建时间降序排列
+默认值：ByCreateTimeAsc
+
+- startTime 待查询历史信息的起始时间，秒级时间戳。
+注意：thread 容器类型暂不支持获取指定时间范围内的消息。
+
+- endTime
+待查询历史信息的结束时间，秒级时间戳。
+注意：thread 容器类型暂不支持获取指定时间范围内的消息。
+
+GET http://localhost:8088/v1/chat/history?chatId=oc_xxx&timeType=day
+
+## 3.2 机器人bot被加入了哪些群
+- userIdType 用户 ID 类型
+示例值："open_id"
+可选值有：
+open_id：标识一个用户在某个应用中的身份。同一个用户在不同应用中的 Open ID 不同。了解更多：如何获取 Open ID
+union_id：标识一个用户在某个应用开发商下的身份。同一用户在同一开发商下的应用中的 Union ID 是相同的，在不同开发商下的应用中的 Union ID 是不同的。通过 Union ID，应用开发商可以把同个用户在多个应用中的身份关联起来。了解更多：如何获取 Union ID？
+user_id：标识一个用户在某个租户内的身份。同一个用户在租户 A 和租户 B 内的 User ID 是不同的。在同一个租户内，一个用户的 User ID 在所有应用（包括商店应用）中都保持一致。User ID 主要用于在不同的应用间打通用户数据。了解更多：如何获取 User ID？
+默认值：open_id
+
+- sortType 群组排序方式
+示例值："ByCreateTimeAsc"
+可选值有：
+ByCreateTimeAsc：按群组创建时间升序排列
+ByActiveTimeDesc：按群组活跃时间降序排列。因群组活跃时间变动频繁，使用 ByActiveTimeDesc 排序方式可能会造成群组遗漏。例如，设置分页大小为 10，发起第一次请求获取到第一页数据后，原本排在第 11 位的群组中有群成员发送了一条消息，那么该群组将被排列到第 1 位，此时发起请求获取第二页数据时，该群组将不能被获取到，需要再从第一页开始获取。
+默认值：ByCreateTimeAsc
+
+GET http://localhost:8088/v1/chats

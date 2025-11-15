@@ -1,5 +1,6 @@
 package top.duhongming.controller;
 
+import com.lark.oapi.service.im.v1.model.ListChat;
 import com.lark.oapi.service.im.v1.model.Message;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -33,5 +34,10 @@ public class ApiController {
             endTime = String.valueOf(TimeRangeSecondUtils.getLastYearEndTime());
         }
         return sendMessageTextService.chatHistory(chatId, sortType, startTime, endTime);
+    }
+
+    @GetMapping("/v1/chats")
+    public List<ListChat> chats(String userIdType, String sortType) throws Exception {
+        return sendMessageTextService.chats(userIdType, sortType);
     }
 }

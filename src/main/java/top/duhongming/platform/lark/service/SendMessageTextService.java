@@ -100,4 +100,36 @@ public class SendMessageTextService {
         return messages;
     }
 
+    /**
+     * https://open.feishu.cn/document/server-docs/group/chat/list
+     *
+     * @param userIdType
+     * @param sortType
+     * @return
+     * @throws Exception
+     */
+    public List<ListChat> chats(String userIdType, String sortType) throws Exception {
+        String pageToken = null;
+        List<ListChat> messages = new ArrayList<>();
+        while (true) {
+            // 创建请求对象
+            ListChatReq req = ListChatReq.newBuilder()
+                    .userIdType(userIdType)
+                    .sortType(sortType)
+                    .pageToken(pageToken)
+                    .pageSize(50)
+                    .build();
+
+            // 发起请求
+            ListChatResp resp = BeanUtils.getBean(Client.class).im().v1().chat().list(req);
+            ListChatRespBody listChatRespBody = resp.getData();
+            messages.addAll(List.of(listChatRespBody.getItems()));
+            if (!listChatRespBody.getHasMore()) {
+                break;
+            }
+            pageToken = listChatRespBody.getPageToken();
+        }
+        return messages;
+    }
+
 }
