@@ -13,10 +13,7 @@ import com.lark.oapi.event.cardcallback.P2CardActionTriggerHandler;
 import com.lark.oapi.event.cardcallback.model.P2CardActionTrigger;
 import com.lark.oapi.event.cardcallback.model.P2CardActionTriggerResponse;
 import com.lark.oapi.service.im.ImService;
-import com.lark.oapi.service.im.v1.model.EventMessage;
-import com.lark.oapi.service.im.v1.model.EventSender;
-import com.lark.oapi.service.im.v1.model.P2ChatAccessEventBotP2pChatEnteredV1;
-import com.lark.oapi.service.im.v1.model.P2MessageReceiveV1;
+import com.lark.oapi.service.im.v1.model.*;
 import io.github.imfangs.dify.client.model.chat.AppInfoResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -30,6 +27,7 @@ import top.duhongming.provider.dify.service.DifyService;
 
 import java.nio.charset.StandardCharsets;
 import java.util.Map;
+import java.util.Objects;
 
 /**
  * 飞书配置
@@ -71,11 +69,29 @@ public class LarkConfig {
                 // https://open.feishu.cn/document/server-docs/im-v1/message/events/receive
                 .onP2MessageReceiveV1(new ImService.P2MessageReceiveV1Handler() {
                     @Override
-                    public void handle(P2MessageReceiveV1 event) throws Exception {
-                        log.info("[ onP2MessageReceiveV1 access ], data: {}\n", Jsons.DEFAULT.toJson(event.getEvent()));
-                        EventMessage eventMessage = event.getEvent().getMessage();
-                        EventSender eventSender = event.getEvent().getSender();
+                    public void handle(P2MessageReceiveV1 p2MessageReceiveV1) throws Exception {
+                        P2MessageReceiveV1Data event = p2MessageReceiveV1.getEvent();
+                        EventMessage eventMessage = event.getMessage();
+                        EventSender eventSender = event.getSender();
                         String messageType = eventMessage.getMessageType();
+
+                        MentionEvent[] mentions = eventMessage.getMentions();
+                        if (StringUtils.equals(eventMessage.getChatType(), "group") || StringUtils.equals(eventMessage.getChatType(), "topic_group")) {
+                            //接收群聊中@机器人消息事件-没有@该机器人时为空
+                            if (Objects.isNull(mentions)) {
+                                return;
+                            }
+                            Boolean isAt = false;
+                            for (MentionEvent mention : mentions) {
+                                if (StringUtils.equals(larkProperties.getAppName(), mention.getName())) {
+                                    isAt = true;
+                                }
+                            }
+                            if (!isAt) {
+                                return;
+                            }
+                        }
+                        log.info("[ onP2MessageReceiveV1 access ], data: {}\n", Jsons.DEFAULT.toJson(p2MessageReceiveV1));
                         String text = "";
                         //https://open.feishu.cn/document/server-docs/im-v1/message-content-description/message_content#3c92befd
                         if (messageType.equals("text")) {

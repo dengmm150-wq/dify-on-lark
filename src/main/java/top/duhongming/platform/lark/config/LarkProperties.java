@@ -22,6 +22,7 @@ import org.springframework.context.annotation.Configuration;
 @ConditionalOnProperty(prefix = "platform.lark", name = "appId")
 public class LarkProperties {
     private String appId;
+    private String appName;
     private String appSecret;
     private String verificationToken;
     private String encryptKey;

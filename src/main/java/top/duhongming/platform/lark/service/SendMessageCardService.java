@@ -44,9 +44,8 @@ public class SendMessageCardService {
      * @return
      * @throws Exception
      */
-    public String createCardByAutoAndReply(P2MessageReceiveV1 event, AppInfoResponse appInfoResponse) throws Exception {
-        EventMessage eventMessage = event.getEvent().getMessage();
-        EventSender eventSender = event.getEvent().getSender();
+    public String createCardByAutoAndReply(P2MessageReceiveV1Data event, AppInfoResponse appInfoResponse) throws Exception {
+        EventMessage eventMessage = event.getMessage();
         String messageId = eventMessage.getMessageId();
         String cardId;
         //如果配置中cardTemplateId不存在，则使用内置Card
@@ -55,18 +54,7 @@ public class SendMessageCardService {
         } else {
             cardId = createCardByTemplate(appInfoResponse);
         }
-        //是group则发到群组里面，是p2p则发到单聊里面
-        String receiveIdType = StringUtils.EMPTY;
-        String receiveId = StringUtils.EMPTY;
-        if (eventMessage.getChatType().equals("group") || eventMessage.getChatType().equals("topic_group")) {
-            receiveIdType = "chat_id";
-            receiveId = eventMessage.getChatId();
-        } else if (eventMessage.getChatType().equals("p2p")) {
-            receiveIdType = "open_id";
-            receiveId = eventSender.getSenderId().getOpenId();
-        }
         this.replyCardMsg(messageId, cardId);
-//        this.sendCardMsg(cardId, receiveIdType, receiveId);
         return cardId;
     }
 

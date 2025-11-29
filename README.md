@@ -65,6 +65,7 @@ dify-on-lark是一个非常轻量级、易于部署 Dify
 | 配置参数                            | 是否必填 | 备注                                                                                          |
 |---------------------------------|------|---------------------------------------------------------------------------------------------|
 | platform.lark.appId             | ✅    | 应用唯一的 ID 标识                                                                                 |
+| platform.lark.appName           | ✅    | 应用名，用于是否@本应用，通过验证后响应                                                                        |
 | platform.lark.appSecret         | ✅    | 应用的密钥，在创建应用时由平台生成，可用于获取 app_access_token                                                    |
 | platform.lark.verificationToken | ✅    | 用于加密事件或回调的请求内容，校验请求来源。当订阅方式为“将事件发送至开发者服务器”或“将回调发送至开发者服务器”时生效                                |
 | platform.lark.encryptKey        | ✅    | 用于加密事件或回调的请求内容，校验请求来源。当订阅方式为“将事件发送至开发者服务器”或“将回调发送至开发者服务器”时生效                                |
@@ -82,6 +83,7 @@ https://open.feishu.cn/app
 
 ```properties
 platform.lark.appId=xxx
+platform.lark.appName=xxx
 platform.lark.appSecret=xxx
 ```
 
