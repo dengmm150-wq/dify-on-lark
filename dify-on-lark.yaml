@@ -1,0 +1,62 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: dify-on-lark
+  namespace: lark
+  labels:
+    app: dify-on-lark
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: dify-on-lark
+  template:
+    metadata:
+      labels:
+        app: dify-on-lark
+    spec:
+      containers:
+        - name: dify-on-lark
+          image: duhongming/dify-on-lark:1.0.2
+          env:
+            - name: TZ
+              value: "Asia/Shanghai"
+            - name: PARAMS
+              value: |
+                --platform.lark.appId=xxx
+                --platform.lark.appSecret=xxx
+                --platform.lark.encryptKey=xxx
+                --platform.lark.verificationToken=xxx
+                --provider.dify.url=http://localhost/v1
+                --provider.dify.auth=app-xxx
+          ports:
+            - containerPort: 8088
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: dify-on-lark-service
+  namespace: lark
+spec:
+  selector:
+    app: dify-on-lark
+  ports:
+    - port: 8088
+      targetPort: 8088
+  type: ClusterIP
+---
+# https://doc.traefik.io/traefik/reference/routing-configuration/kubernetes/crd/http/ingressroute/
+apiVersion: traefik.io/v1alpha1
+kind: IngressRoute
+metadata:
+  name: dify-on-lark-ingress-route-http
+  namespace: lark
+spec:
+  entryPoints:
+    - web
+  routes:
+    - match: Host(`dify-on-lark.example.com`)
+      kind: Rule
+      services:
+        - name: dify-on-lark-service
+          port: 8088
