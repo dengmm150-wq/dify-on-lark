@@ -4,6 +4,7 @@ import io.github.imfangs.dify.client.DifyClient;
 import io.github.imfangs.dify.client.callback.ChatflowStreamCallback;
 import io.github.imfangs.dify.client.enums.ResponseMode;
 import io.github.imfangs.dify.client.event.*;
+import io.github.imfangs.dify.client.exception.DifyApiException;
 import io.github.imfangs.dify.client.model.chat.AppInfoResponse;
 import io.github.imfangs.dify.client.model.chat.ChatMessage;
 import io.github.imfangs.dify.client.model.chat.SuggestedQuestionsResponse;
@@ -18,8 +19,10 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 import top.duhongming.platform.lark.service.SendMessageCardService;
 
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Optional;
 
 import static top.duhongming.common.Constants.*;
 
@@ -56,9 +59,12 @@ public class DifyService {
      * @param user
      * @return
      */
-    @SneakyThrows
     public SuggestedQuestionsResponse suggested(String messageId, String user) {
-        return difyClient.getSuggestedQuestions(messageId, user);
+        try {
+            return difyClient.getSuggestedQuestions(messageId, user);
+        } catch (IOException | DifyApiException e) {
+            return null;
+        }
     }
 
     /**
@@ -127,15 +133,20 @@ public class DifyService {
 
                 //更新相关知识库引用
                 StringBuilder retrieverContent = new StringBuilder();
+                Optional<List<RetrieverResource>> optional = Optional.ofNullable(event).map(MessageEndEvent::getMetadata).map(Metadata::getRetrieverResources);
+                if (optional.isPresent()) {
+                    List<RetrieverResource> retrieverResources = optional.get();
+                    for (int i = 0; i < retrieverResources.size(); i++) {
+                        RetrieverResource retrieverResource = retrieverResources.get(i);
+                        retrieverContent.append("<number_tag>").append(i + 1).append("</number_tag>").append(retrieverResource.getDocumentName()).append("\n");
+                    }
+                    if (StringUtils.isNotBlank(retrieverContent.toString())) {
+                        sendMessageCardService.updateCardMsg(cardId, CARD_ELEMENT_ID_STREAMING_DOCUMENT, retrieverContent.toString(), sequence++);
+                    }
+                }
+
+                //更新使用token和耗时统计
                 Metadata metadata = event.getMetadata();
-                List<RetrieverResource> retrieverResources = metadata.getRetrieverResources();
-                for (int i = 0; i < retrieverResources.size(); i++) {
-                    RetrieverResource retrieverResource = retrieverResources.get(i);
-                    retrieverContent.append("<number_tag>").append(i + 1).append("</number_tag>").append(retrieverResource.getDocumentName()).append("\n");
-                }
-                if (StringUtils.isNotBlank(retrieverContent.toString())) {
-                    sendMessageCardService.updateCardMsg(cardId, CARD_ELEMENT_ID_STREAMING_DOCUMENT, retrieverContent.toString(), sequence++);
-                }
                 Usage usage = metadata.getUsage();
                 String usageContent = "<font color=\"grey-600\">提示词token:" + usage.getPromptTokens() + ", " +
                         "回答token:" + usage.getCompletionTokens() + ", " +
@@ -222,7 +233,6 @@ public class DifyService {
             public void onMessageReplace(MessageReplaceEvent event) {
                 log.info("onMessageReplace: {}", event);
             }
-
 
 
             @Override
