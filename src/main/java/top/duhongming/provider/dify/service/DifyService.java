@@ -95,7 +95,7 @@ public class DifyService {
         // 发送流式消息
         difyClient.sendChatMessageStream(message, new ChatflowStreamCallback() {
             int sequence = 1;
-            final StringBuffer content = new StringBuffer();
+            final StringBuilder content = new StringBuilder();
             long lastTime = System.currentTimeMillis();
 
             @Override
@@ -120,43 +120,19 @@ public class DifyService {
                 sendMessageCardService.updateCardMsg(cardId, CARD_ELEMENT_ID_STREAMING_ANSWER, content.toString(), sequence++);
 
                 //更新相关问题
-                SuggestedQuestionsResponse suggestedQuestionsResponse = suggested(messageId, user);
-                List<String> suggestedQuestionsList = suggestedQuestionsResponse.getData();
-                StringBuilder suggestedContent = new StringBuilder();
-                for (int i = 0; i < suggestedQuestionsList.size(); i++) {
-                    suggestedContent.append("<number_tag>").append(i + 1).append("</number_tag>").append(suggestedQuestionsList.get(i)).append("\n");
-                }
-                if (StringUtils.isNotBlank(suggestedContent.toString())) {
-                    sendMessageCardService.updateCardMsg(cardId, CARD_ELEMENT_ID_STREAMING_QUESTION, suggestedContent.toString(), sequence++);
-                }
+                updateSuggested(messageId, user, cardId, sequence++);
 
                 //更新相关知识库引用
-                StringBuilder retrieverContent = new StringBuilder();
-                Optional<List<RetrieverResource>> optional = Optional.ofNullable(event).map(MessageEndEvent::getMetadata).map(Metadata::getRetrieverResources);
-                if (optional.isPresent()) {
-                    List<RetrieverResource> retrieverResources = optional.get();
-                    for (int i = 0; i < retrieverResources.size(); i++) {
-                        RetrieverResource retrieverResource = retrieverResources.get(i);
-                        retrieverContent.append("<number_tag>").append(i + 1).append("</number_tag>").append(retrieverResource.getDocumentName()).append("\n");
-                    }
-                    if (StringUtils.isNotBlank(retrieverContent.toString())) {
-                        sendMessageCardService.updateCardMsg(cardId, CARD_ELEMENT_ID_STREAMING_DOCUMENT, retrieverContent.toString(), sequence++);
-                    }
-                }
+                updateRetrieverResource(event, cardId, sequence++);
 
                 //更新使用token和耗时统计
-                Metadata metadata = event.getMetadata();
-                Usage usage = metadata.getUsage();
-                String usageContent = "<font color=\"grey-600\">提示词token:" + usage.getPromptTokens() + ", " +
-                        "回答token:" + usage.getCompletionTokens() + ", " +
-                        "总token:" + usage.getTotalTokens() + ", " +
-                        "耗时:" + String.format("%.2f", usage.getLatency()) + "s</font>";
-                sendMessageCardService.updateCardMsg(cardId, CARD_ELEMENT_ID_STREAMING_USAGE, usageContent, sequence++);
+                updateUsage(event, cardId, sequence++);
 
                 //更新消息反馈
                 sendMessageCardService.like(cardId, user, messageId, false, sequence++);
                 sendMessageCardService.dislike(cardId, user, messageId, false, sequence++);
             }
+
 
             @Override
             public void onWorkflowStarted(WorkflowStartedEvent event) {
@@ -271,5 +247,42 @@ public class DifyService {
                 }
             }
         });
+    }
+
+    private void updateRetrieverResource(MessageEndEvent event, String cardId, Integer sequence) {
+        StringBuilder retrieverContent = new StringBuilder();
+        Optional<List<RetrieverResource>> optional = Optional.ofNullable(event).map(MessageEndEvent::getMetadata).map(Metadata::getRetrieverResources);
+        if (optional.isPresent()) {
+            List<RetrieverResource> retrieverResources = optional.get();
+            for (int i = 0; i < retrieverResources.size(); i++) {
+                RetrieverResource retrieverResource = retrieverResources.get(i);
+                retrieverContent.append("<number_tag>").append(i + 1).append("</number_tag>").append(retrieverResource.getDocumentName()).append("\n");
+            }
+            if (StringUtils.isNotBlank(retrieverContent.toString())) {
+                sendMessageCardService.updateCardMsg(cardId, CARD_ELEMENT_ID_STREAMING_DOCUMENT, retrieverContent.toString(), sequence);
+            }
+        }
+    }
+
+    private void updateSuggested(String messageId, String user, String cardId, Integer sequence) {
+        SuggestedQuestionsResponse suggestedQuestionsResponse = suggested(messageId, user);
+        List<String> suggestedQuestionsList = suggestedQuestionsResponse.getData();
+        StringBuilder suggestedContent = new StringBuilder();
+        for (int i = 0; i < suggestedQuestionsList.size(); i++) {
+            suggestedContent.append("<number_tag>").append(i + 1).append("</number_tag>").append(suggestedQuestionsList.get(i)).append("\n");
+        }
+        if (StringUtils.isNotBlank(suggestedContent.toString())) {
+            sendMessageCardService.updateCardMsg(cardId, CARD_ELEMENT_ID_STREAMING_QUESTION, suggestedContent.toString(), sequence);
+        }
+    }
+
+    private void updateUsage(MessageEndEvent event, String cardId, Integer sequence) {
+        Metadata metadata = event.getMetadata();
+        Usage usage = metadata.getUsage();
+        String usageContent = "<font color=\"grey-600\">提示词token:" + usage.getPromptTokens() + ", " +
+                "回答token:" + usage.getCompletionTokens() + ", " +
+                "总token:" + usage.getTotalTokens() + ", " +
+                "耗时:" + String.format("%.2f", usage.getLatency()) + "s</font>";
+        sendMessageCardService.updateCardMsg(cardId, CARD_ELEMENT_ID_STREAMING_USAGE, usageContent, sequence);
     }
 }
