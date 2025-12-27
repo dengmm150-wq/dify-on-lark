@@ -83,7 +83,6 @@ public class DifyService {
     @SneakyThrows
     public void chatMessages(String query, String cardId, String user) {
         HashMap<String, Object> inputs = new HashMap<>();
-        inputs.put("project", "电检维修助手");
         // 创建聊天消息
         ChatMessage message = ChatMessage.builder()
                 .query(query)
@@ -177,6 +176,8 @@ public class DifyService {
             @Override
             public void onWorkflowFinished(WorkflowFinishedEvent event) {
                 log.info("onWorkflowFinished: {}", event);
+                String answer = Optional.ofNullable(event).map(WorkflowFinishedEvent::getData).map(WorkflowFinishedEvent.WorkflowFinishedData::getOutputs).map(e -> e.get("answer")).map(Object::toString).orElse("");
+                handleAnswer(answer);
             }
 
             @Override
@@ -256,6 +257,9 @@ public class DifyService {
             }
 
             private void handleAnswer(String answer) {
+                if (StringUtils.isEmpty(answer)) {
+                    return;
+                }
                 content.append(answer);
                 sequence++;
 

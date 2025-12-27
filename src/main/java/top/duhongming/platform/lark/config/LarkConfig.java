@@ -113,7 +113,7 @@ public class LarkConfig {
                         } else {
                             AppInfoResponse appInfoResponse = difyService.info();
                             String cardId = sendMessageCardService.createCardByAutoAndReply(event, appInfoResponse);
-                            difyService.chatMessages(text, cardId, eventSender.getSenderId().getOpenId());
+                            difyService.chatMessages(text, cardId, eventSender.getSenderId().getUserId());
                         }
                     }
                 })
