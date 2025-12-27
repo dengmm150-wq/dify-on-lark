@@ -4,6 +4,8 @@ import com.lark.oapi.service.im.v1.model.ListChat;
 import com.lark.oapi.service.im.v1.model.Message;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
@@ -12,6 +14,7 @@ import top.duhongming.platform.lark.service.SendMessageTextService;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Stream;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.*;
@@ -31,68 +34,25 @@ class ApiControllerTest {
         // Mockito自动初始化mock对象
     }
 
-    @Test
-    void testChatHistoryWithDayTimeType() throws Exception {
+    @ParameterizedTest
+    @MethodSource("timeTypeProvider")
+    void testChatHistoryWithDifferentTimeTypes(String timeType) throws Exception {
         String chatId = "test_chat_id";
         String sortType = "ByCreateTimeDesc";
         List<Message> expectedMessages = new ArrayList<>();
-        
+
         when(sendMessageTextService.chatHistory(anyString(), eq(sortType), anyString(), anyString()))
                 .thenReturn(expectedMessages);
-        
-        List<Message> result = apiController.chatHistory(chatId, sortType, null, null, "day");
-        
+
+        List<Message> result = apiController.chatHistory(chatId, sortType, null, null, timeType);
+
         assertNotNull(result);
         assertEquals(expectedMessages, result);
         verify(sendMessageTextService, times(1)).chatHistory(eq(chatId), eq(sortType), anyString(), anyString());
     }
 
-    @Test
-    void testChatHistoryWithWeekTimeType() throws Exception {
-        String chatId = "test_chat_id";
-        String sortType = "ByCreateTimeDesc";
-        List<Message> expectedMessages = new ArrayList<>();
-        
-        when(sendMessageTextService.chatHistory(anyString(), eq(sortType), anyString(), anyString()))
-                .thenReturn(expectedMessages);
-        
-        List<Message> result = apiController.chatHistory(chatId, sortType, null, null, "week");
-        
-        assertNotNull(result);
-        assertEquals(expectedMessages, result);
-        verify(sendMessageTextService, times(1)).chatHistory(eq(chatId), eq(sortType), anyString(), anyString());
-    }
-
-    @Test
-    void testChatHistoryWithMonthTimeType() throws Exception {
-        String chatId = "test_chat_id";
-        String sortType = "ByCreateTimeDesc";
-        List<Message> expectedMessages = new ArrayList<>();
-        
-        when(sendMessageTextService.chatHistory(anyString(), eq(sortType), anyString(), anyString()))
-                .thenReturn(expectedMessages);
-        
-        List<Message> result = apiController.chatHistory(chatId, sortType, null, null, "month");
-        
-        assertNotNull(result);
-        assertEquals(expectedMessages, result);
-        verify(sendMessageTextService, times(1)).chatHistory(eq(chatId), eq(sortType), anyString(), anyString());
-    }
-
-    @Test
-    void testChatHistoryWithYearTimeType() throws Exception {
-        String chatId = "test_chat_id";
-        String sortType = "ByCreateTimeDesc";
-        List<Message> expectedMessages = new ArrayList<>();
-        
-        when(sendMessageTextService.chatHistory(anyString(), eq(sortType), anyString(), anyString()))
-                .thenReturn(expectedMessages);
-        
-        List<Message> result = apiController.chatHistory(chatId, sortType, null, null, "year");
-        
-        assertNotNull(result);
-        assertEquals(expectedMessages, result);
-        verify(sendMessageTextService, times(1)).chatHistory(eq(chatId), eq(sortType), anyString(), anyString());
+    private static Stream<String> timeTypeProvider() {
+        return Stream.of("day", "week", "month", "year");
     }
 
     @Test
@@ -102,12 +62,12 @@ class ApiControllerTest {
         String startTime = "1000000000";
         String endTime = "2000000000";
         List<Message> expectedMessages = new ArrayList<>();
-        
+
         when(sendMessageTextService.chatHistory(eq(chatId), eq(sortType), eq(startTime), eq(endTime)))
                 .thenReturn(expectedMessages);
-        
+
         List<Message> result = apiController.chatHistory(chatId, sortType, startTime, endTime, null);
-        
+
         assertNotNull(result);
         assertEquals(expectedMessages, result);
         verify(sendMessageTextService, times(1)).chatHistory(chatId, sortType, startTime, endTime);
@@ -118,14 +78,13 @@ class ApiControllerTest {
         String userIdType = "open_id";
         String sortType = "ByCreateTimeDesc";
         List<ListChat> expectedChats = new ArrayList<>();
-        
+
         when(sendMessageTextService.chats(userIdType, sortType)).thenReturn(expectedChats);
-        
+
         List<ListChat> result = apiController.chats(userIdType, sortType);
-        
+
         assertNotNull(result);
         assertEquals(expectedChats, result);
         verify(sendMessageTextService, times(1)).chats(userIdType, sortType);
     }
 }
-
