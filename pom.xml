@@ -91,6 +91,34 @@
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-maven-plugin</artifactId>
             </plugin>
+
+            <!-- Jacoco 代码覆盖率插件 -->
+            <plugin>
+                <groupId>org.jacoco</groupId>
+                <artifactId>jacoco-maven-plugin</artifactId>
+                <version>0.8.10</version> <!-- 推荐稳定版本，可按需升级 -->
+                <executions>
+                    <!-- 1. 预配置：在测试执行前初始化Jacoco，用于收集覆盖率数据 -->
+                    <execution>
+                        <id>pre-test</id>
+                        <goals>
+                            <goal>prepare-agent</goal>
+                        </goals>
+                    </execution>
+                    <!-- 2. 后处理：测试执行完成后，生成覆盖率报告（XML+HTML） -->
+                    <execution>
+                        <id>post-test</id>
+                        <phase>test</phase> <!-- 绑定到test阶段，测试完成后自动生成报告 -->
+                        <goals>
+                            <goal>report</goal>
+                        </goals>
+                        <configuration>
+                            <!-- 报告输出目录（默认在target/site/jacoco，无需修改，Jenkins后续读取此路径） -->
+                            <outputDirectory>${project.build.directory}/site/jacoco</outputDirectory>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
         </plugins>
     </build>
 
