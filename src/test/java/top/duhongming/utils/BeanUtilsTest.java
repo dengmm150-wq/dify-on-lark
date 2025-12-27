@@ -20,7 +20,7 @@ class BeanUtilsTest {
     void setUp() {
         mockContext = mock(ApplicationContext.class);
         testBean = new TestBean("test");
-        
+
         // 保存原始的ApplicationContext
         try {
             Field field = BeanUtils.class.getDeclaredField("applicationContext");
@@ -49,9 +49,9 @@ class BeanUtilsTest {
     void testGetBeanWithNameAndClass() {
         String beanName = "testBean";
         when(mockContext.getBean(beanName, TestBean.class)).thenReturn(testBean);
-        
+
         TestBean result = BeanUtils.getBean(beanName, TestBean.class);
-        
+
         assertNotNull(result);
         assertEquals("test", result.getValue());
         verify(mockContext).getBean(beanName, TestBean.class);
@@ -60,9 +60,9 @@ class BeanUtilsTest {
     @Test
     void testGetBeanWithClass() {
         when(mockContext.getBean(TestBean.class)).thenReturn(testBean);
-        
+
         TestBean result = BeanUtils.getBean(TestBean.class);
-        
+
         assertNotNull(result);
         assertEquals("test", result.getValue());
         verify(mockContext).getBean(TestBean.class);
@@ -75,10 +75,10 @@ class BeanUtilsTest {
         when(mockContext.getBean("bean1")).thenReturn(new Object());
         when(mockContext.getBean("bean2")).thenReturn(new Object());
         when(mockContext.getBean("bean3")).thenReturn(new Object());
-        
+
         // 这个方法主要打印日志，我们只需要验证它不会抛出异常
-        assertDoesNotThrow(() -> BeanUtils.printAllBeans());
-        
+        assertDoesNotThrow(BeanUtils::printAllBeans);
+
         verify(mockContext).getBeanDefinitionNames();
     }
 

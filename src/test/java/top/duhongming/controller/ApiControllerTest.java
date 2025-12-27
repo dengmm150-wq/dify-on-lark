@@ -40,12 +40,13 @@ class ApiControllerTest {
         String chatId = "test_chat_id";
         String sortType = "ByCreateTimeDesc";
         List<Message> expectedMessages = new ArrayList<>();
-
-        when(sendMessageTextService.chatHistory(anyString(), eq(sortType), anyString(), anyString()))
+        
+        // 简化：使用更一致的参数匹配器
+        when(sendMessageTextService.chatHistory(eq(chatId), eq(sortType), anyString(), anyString()))
                 .thenReturn(expectedMessages);
-
+        
         List<Message> result = apiController.chatHistory(chatId, sortType, null, null, timeType);
-
+        
         assertNotNull(result);
         assertEquals(expectedMessages, result);
         verify(sendMessageTextService, times(1)).chatHistory(eq(chatId), eq(sortType), anyString(), anyString());
@@ -62,12 +63,13 @@ class ApiControllerTest {
         String startTime = "1000000000";
         String endTime = "2000000000";
         List<Message> expectedMessages = new ArrayList<>();
-
-        when(sendMessageTextService.chatHistory(eq(chatId), eq(sortType), eq(startTime), eq(endTime)))
+        
+        // 简化：移除不必要的eq()匹配器
+        when(sendMessageTextService.chatHistory(chatId, sortType, startTime, endTime))
                 .thenReturn(expectedMessages);
-
+        
         List<Message> result = apiController.chatHistory(chatId, sortType, startTime, endTime, null);
-
+        
         assertNotNull(result);
         assertEquals(expectedMessages, result);
         verify(sendMessageTextService, times(1)).chatHistory(chatId, sortType, startTime, endTime);
@@ -78,11 +80,12 @@ class ApiControllerTest {
         String userIdType = "open_id";
         String sortType = "ByCreateTimeDesc";
         List<ListChat> expectedChats = new ArrayList<>();
-
+        
+        // 已经是简化形式
         when(sendMessageTextService.chats(userIdType, sortType)).thenReturn(expectedChats);
-
+        
         List<ListChat> result = apiController.chats(userIdType, sortType);
-
+        
         assertNotNull(result);
         assertEquals(expectedChats, result);
         verify(sendMessageTextService, times(1)).chats(userIdType, sortType);
