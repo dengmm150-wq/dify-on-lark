@@ -17,7 +17,7 @@ spec:
     spec:
       containers:
         - name: dify-on-lark
-          image: duhongming/dify-on-lark:1.0.2
+          image: duhongming/dify-on-lark:1.0.4
           env:
             - name: TZ
               value: "Asia/Shanghai"

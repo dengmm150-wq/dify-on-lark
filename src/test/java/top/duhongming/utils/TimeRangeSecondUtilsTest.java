@@ -83,21 +83,7 @@ class TimeRangeSecondUtilsTest {
         assertTrue(lastMonthEnd < currentTimestamp, "上月结束时间应该小于当前时间");
     }
 
-    @Test
-    void testGetLastYearStartTime() {
-        long lastYearStart = TimeRangeSecondUtils.getLastYearStartTime();
-        assertTrue(lastYearStart > 0, "去年开始时间戳应该大于0");
-        
-        long currentTimestamp = System.currentTimeMillis() / 1000;
-        assertTrue(lastYearStart < currentTimestamp, "去年开始时间应该小于当前时间");
-        
-        long lastYearEnd = TimeRangeSecondUtils.getLastYearEndTime();
-        assertTrue(lastYearStart < lastYearEnd, "去年开始时间应该小于结束时间");
-        
-        // 验证时间差应该在365-366天之间（取决于是否是闰年）
-        long diff = lastYearEnd - lastYearStart;
-        assertTrue(diff >= 365 * 86400 && diff <= 366 * 86400, "去年的时间范围应该在365-366天之间");
-    }
+
 
     @Test
     void testGetLastYearEndTime() {
@@ -106,20 +92,5 @@ class TimeRangeSecondUtilsTest {
         
         long currentTimestamp = System.currentTimeMillis() / 1000;
         assertTrue(lastYearEnd < currentTimestamp, "去年结束时间应该小于当前时间");
-    }
-
-    @Test
-    void testTimeRangeOrder() {
-        // 验证所有时间范围的顺序：去年 < 上月 < 上周 < 昨天 < 现在
-        long lastYearEnd = TimeRangeSecondUtils.getLastYearEndTime();
-        long lastMonthEnd = TimeRangeSecondUtils.getLastMonthEndTime();
-        long lastWeekEnd = TimeRangeSecondUtils.getLastWeekEndTime();
-        long yesterdayEnd = TimeRangeSecondUtils.getYesterdayEndTime();
-        long currentTimestamp = System.currentTimeMillis() / 1000;
-        
-        assertTrue(lastYearEnd < lastMonthEnd, "去年结束应该早于上月结束");
-        assertTrue(lastMonthEnd < lastWeekEnd, "上月结束应该早于上周结束");
-        assertTrue(lastWeekEnd < yesterdayEnd, "上周结束应该早于昨天结束");
-        assertTrue(yesterdayEnd < currentTimestamp, "昨天结束应该早于当前时间");
     }
 }

@@ -352,3 +352,4 @@ GET http://localhost:8088/api/v1/chats
 - [~] 更新消息处理逻辑，减少NPE
 - [~] 修复在工作流中，飞书消息显示不全问题处理
 - [^] 升级oapi-sdk和dify-java-client依赖版本
+- [+] 添加sonar和质量门及jacoco代码覆盖率报告
